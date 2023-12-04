@@ -1,0 +1,26 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #ff00e0;
+}
+
+.container {
+    text-align: center;
+    background-color: #30ff00;
+    padding: 30px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(48, 255, 0, 0.1);
+}
+
+.heading {
+    font-size: 48px;
+    transition: all 0.3s ease-in-out;
+}
+
+.container:hover .heading {
+    font-size: 64px;
+}
