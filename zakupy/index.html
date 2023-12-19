@@ -4,13 +4,44 @@
   <meta charset="UTF-8">
   <title>Lista Zakupów</title>
   <style>
-    /* Dodatkowy styl dla prostoty wyglądu */
+    /* Styl dla prostoty wyglądu */
     body {
       font-family: Arial, sans-serif;
-      margin: 20px;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
     }
-    h1 {
+    header {
+      background-color: #333;
+      color: white;
       text-align: center;
+      padding: 10px 0;
+    }
+    nav ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      background-color: #444;
+      text-align: center;
+    }
+    nav ul li {
+      display: inline;
+      margin-right: 20px;
+    }
+    nav ul li a {
+      color: white;
+      text-decoration: none;
+    }
+    nav ul li a:hover {
+      color: #ddd;
+    }
+    #container {
+      width: 80%;
+      margin: 20px auto;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
     #shopping-list {
       width: 300px;
@@ -38,10 +69,30 @@
     li {
       margin-bottom: 5px;
     }
+    .delete-btn {
+      background-color: #f44336;
+      margin-left: 5px;
+      padding: 5px 10px;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .delete-btn:hover {
+      background-color: #d32f2f;
+    }
   </style>
 </head>
 <body>
-  <h1>Lista Zakupów</h1>
+
+  <header>
+    <h1>Lista Zakupów</h1>
+  </header>
+
+  <nav>
+    <ul>
+      <li><a href="#">Strona główna</a></li>
+    </ul>
+  </nav>
   
   <div id="shopping-list">
     <input type="text" id="item" placeholder="Dodaj produkt...">
@@ -61,6 +112,15 @@
         var itemList = document.getElementById("items-list");
         var listItem = document.createElement("li");
         listItem.textContent = itemText;
+        
+        var deleteButton = document.createElement("button");
+        deleteButton.textContent = "Usuń";
+        deleteButton.className = "delete-btn";
+        deleteButton.onclick = function() {
+          deleteItem(this.parentElement);
+        };
+        
+        listItem.appendChild(deleteButton);
         itemList.appendChild(listItem);
         input.value = "";
 
@@ -78,6 +138,23 @@
       }
     }
 
+    // Funkcja usuwająca element z listy i aktualizująca localStorage
+    function deleteItem(item) {
+      var itemName = item.textContent.trim();
+      var itemList = document.getElementById("items-list");
+      itemList.removeChild(item);
+
+      var items = localStorage.getItem("shoppingItems");
+      if (items) {
+        items = JSON.parse(items);
+        var index = items.indexOf(itemName);
+        if (index !== -1) {
+          items.splice(index, 1);
+          localStorage.setItem("shoppingItems", JSON.stringify(items));
+        }
+      }
+    }
+
     // Wczytanie listy z localStorage po załadowaniu strony
     window.onload = function() {
       var savedItems = localStorage.getItem("shoppingItems");
@@ -87,6 +164,15 @@
         savedItems.forEach(function(item) {
           var listItem = document.createElement("li");
           listItem.textContent = item;
+          
+          var deleteButton = document.createElement("button");
+          deleteButton.textContent = "Usuń";
+          deleteButton.className = "delete-btn";
+          deleteButton.onclick = function() {
+            deleteItem(this.parentElement);
+          };
+          
+          listItem.appendChild(deleteButton);
           itemList.appendChild(listItem);
         });
       }
