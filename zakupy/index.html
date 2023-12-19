@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Lista Zakupów</title>
+  <style>
+    /* Dodatkowy styl dla prostoty wyglądu */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    h1 {
+      text-align: center;
+    }
+    #shopping-list {
+      width: 300px;
+      margin: 0 auto;
+    }
+    input[type="text"] {
+      width: 70%;
+      padding: 8px;
+      margin-bottom: 10px;
+    }
+    button {
+      padding: 8px 15px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    li {
+      margin-bottom: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Lista Zakupów</h1>
+  
+  <div id="shopping-list">
+    <input type="text" id="item" placeholder="Dodaj produkt...">
+    <button onclick="addItem()">Dodaj</button>
+    <ul id="items-list">
+      <!-- Tutaj będą dodawane elementy listy -->
+    </ul>
+  </div>
+
+  <script>
+    // Funkcja dodająca elementy do listy i zapisująca je w localStorage
+    function addItem() {
+      var input = document.getElementById("item");
+      var itemText = input.value.trim();
+      
+      if (itemText !== "") {
+        var itemList = document.getElementById("items-list");
+        var listItem = document.createElement("li");
+        listItem.textContent = itemText;
+        itemList.appendChild(listItem);
+        input.value = "";
+
+        // Zapisanie listy do localStorage
+        var items = localStorage.getItem("shoppingItems");
+        if (items) {
+          items = JSON.parse(items);
+          items.push(itemText);
+        } else {
+          items = [itemText];
+        }
+        localStorage.setItem("shoppingItems", JSON.stringify(items));
+      } else {
+        alert("Wprowadź nazwę produktu!");
+      }
+    }
+
+    // Wczytanie listy z localStorage po załadowaniu strony
+    window.onload = function() {
+      var savedItems = localStorage.getItem("shoppingItems");
+      if (savedItems) {
+        savedItems = JSON.parse(savedItems);
+        var itemList = document.getElementById("items-list");
+        savedItems.forEach(function(item) {
+          var listItem = document.createElement("li");
+          listItem.textContent = item;
+          itemList.appendChild(listItem);
+        });
+      }
+    };
+  </script>
+</body>
+</html>
