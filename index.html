@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nasza Rocznica</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Nasza Rocznica</h1>
+        <div class="counter">
+            <h2>Do Naszej Rocznicy Zostało:</h2>
+            <div id="countdown"></div>
+        </div>
+    </div>
+
+    <script>
+        // Ustaw datę rocznicy
+        const anniversaryDate = new Date('2024-04-15').getTime();
+
+        // Aktualizuj licznik co sekundę
+        const countdown = setInterval(function() {
+            const now = new Date().getTime();
+            const distance = anniversaryDate - now;
+
+            // Obliczanie dni, godzin, minut i sekund
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            // Wyświetlanie rezultatów w divie z id "countdown"
+            document.getElementById("countdown").innerHTML = `
+                <div>${days}<span>Dni</span></div>
+                <div>${hours}<span>Godzin</span></div>
+                <div>${minutes}<span>Minut</span></div>
+                <div>${seconds}<span>Sekund</span></div>
+            `;
+
+            // Po osiągnięciu daty rocznicy, zatrzymaj licznik
+            if (distance < 0) {
+                clearInterval(countdown);
+                document.getElementById("countdown").innerHTML = "Czas na świętowanie!";
+            }
+        }, 1000);
+    </script>
+</body>
+</html>
