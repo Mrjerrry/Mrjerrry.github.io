@@ -1,0 +1,364 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lista Zakupów</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background-color: #333;
+    color: #fff;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #222;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    font-weight: bold;
+}
+
+.form-group input[type="text"], .form-group input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #444;
+    color: #fff;
+}
+
+.btn {
+    display: inline-block;
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.btn:hover {
+    background-color: #0056b3;
+}
+
+.shopping-list {
+    margin-top: 20px;
+}
+
+.category {
+    margin-bottom: 10px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.fullscreen-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    width: 100%;
+    max-height: 80%;
+    overflow-y: auto;
+    text-align: left;
+}
+
+.dark-mode .fullscreen-content {
+    background-color: #444;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    margin-bottom: 5px;
+}
+
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    color: #777;
+}
+
+.light-mode .container {
+    background-color: #fff;
+    color: #333;
+}
+
+.light-mode .form-group input[type="text"], .light-mode .form-group input[type="password"] {
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+.light-mode .btn {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.light-mode .btn:hover {
+    background-color: #0056b3;
+}
+
+.dark-mode-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+}
+
+</style>
+</head>
+<body class="dark-mode">
+<div class="container" id="loginContainer">
+    <h2>Panel logowania</h2>
+    <div class="form-group">
+        <label for="username">Nazwa użytkownika:</label>
+        <input type="text" id="username" name="username">
+    </div>
+    <div class="form-group">
+        <label for="password">Hasło:</label>
+        <input type="password" id="password" name="password">
+    </div>
+    <button class="btn" onclick="login()">Zaloguj się</button>
+</div>
+
+<div id="shoppingList" class="shopping-list" style="display:none;">
+    <button class="logout-btn btn" onclick="logout()">Wyloguj</button>
+    <h2>Twoja lista zakupów</h2>
+    <div id="categories"></div>
+    <button class="btn" onclick="openModal('Dodaj kategorię')">Dodaj kategorię</button>
+</div>
+
+<div id="addCategoryModal" class="fullscreen" style="display: none;">
+    <div class="fullscreen-content">
+        <button class="close-btn" onclick="closeModal()">&times;</button>
+        <h2 id="modalTitle"></h2>
+        <input type="text" id="categoryNameInput" placeholder="Nazwa kategorii">
+        <button class="btn" onclick="addCategory()">Dodaj</button>
+    </div>
+</div>
+
+<div id="categoryModal" class="fullscreen" style="display: none;">
+    <div class="fullscreen-content">
+        <button class="close-btn" onclick="closeCategoryModal()">&times;</button>
+        <h2 id="categoryTitle"></h2>
+        <input type="text" id="itemInput" placeholder="Dodaj nowy produkt">
+        <button class="btn" onclick="addItem()">Dodaj</button>
+        <ul id="categoryItems"></ul>
+        <button class="btn" onclick="deleteCategory()">Usuń kategorię</button>
+    </div>
+</div>
+
+<button class="btn dark-mode-btn" onclick="toggleDarkMode()">Tryb jasny</button>
+
+<script>
+var categories = {};
+var currentCategory = "";
+var currentUser = "";
+var darkMode = true;
+
+function login() {
+    var username = document.getElementById("username").value;
+    var password = document.getElementById("password").value;
+
+    // Sprawdzenie czy hasło i login są poprawne
+    if (username === "ja" && password === "xd") {
+        currentUser = username;
+        document.getElementById("loginContainer").style.display = "none";
+        document.getElementById("shoppingList").style.display = "block";
+        loadShoppingList();
+    } else {
+        alert("Niepoprawny login lub hasło.");
+    }
+}
+
+function logout() {
+    currentUser = "";
+    document.getElementById("loginContainer").style.display = "block";
+    document.getElementById("shoppingList").style.display = "none";
+    categories = {};
+    document.getElementById("categories").innerHTML = "";
+}
+
+function renderCategories() {
+    var categoriesContainer = document.getElementById("categories");
+    categoriesContainer.innerHTML = "";
+    for (var category in categories) {
+        var categoryElement = document.createElement("div");
+        categoryElement.innerHTML = "<h3 class='category' onclick='openCategory(\"" + category + "\")'>" + category + "</h3>";
+        categoriesContainer.appendChild(categoryElement);
+    }
+
+
+}
+
+function openModal(title) {
+    document.getElementById("modalTitle").innerText = title;
+    document.getElementById("addCategoryModal").style.display = "flex";
+    document.getElementById("shoppingList").style.display = "none";
+}
+
+function closeModal() {
+    document.getElementById("addCategoryModal").style.display = "none";
+    document.getElementById("shoppingList").style.display = "block";
+}
+
+function addCategory() {
+    var categoryName = document.getElementById("categoryNameInput").value;
+
+    if (categoryName.trim() !== "") {
+        categories[categoryName] = [];
+        renderCategories();
+        saveShoppingList();
+        closeModal();
+    } else {
+        alert("Nazwa kategorii nie może być pusta.");
+    }
+}
+
+function openCategory(categoryName) {
+    currentCategory = categoryName;
+    document.getElementById("categoryTitle").innerText = categoryName;
+    renderItems(currentCategory);
+    document.getElementById("categoryModal").style.display = "flex";
+    document.getElementById("shoppingList").style.display = "none";
+}
+
+function closeCategoryModal() {
+    document.getElementById("categoryModal").style.display = "none";
+    currentCategory = "";
+    document.getElementById("shoppingList").style.display = "block";
+}
+
+function addItem() {
+    var item = document.getElementById("itemInput").value;
+
+    if (item.trim() !== "") {
+        categories[currentCategory].push(item);
+        renderItems(currentCategory);
+        saveShoppingList();
+        document.getElementById("itemInput").value = "";
+    } else {
+        alert("Nazwa produktu nie może być pusta.");
+    }
+}
+
+function renderItems(categoryName) {
+    var itemList = document.getElementById("categoryItems");
+    itemList.innerHTML = "";
+    categories[categoryName].forEach(function(item, index) {
+        var li = document.createElement("li");
+        li.textContent = item;
+        var deleteButton = document.createElement("button");
+        deleteButton.textContent = "Usuń";
+        deleteButton.onclick = function() {
+            deleteItem(categoryName, index);
+        };
+        li.appendChild(deleteButton);
+        itemList.appendChild(li);
+    });
+}
+
+function deleteItem(categoryName, index) {
+    if (confirm("Czy na pewno chcesz usunąć ten produkt?")) {
+        categories[categoryName].splice(index, 1);
+        renderItems(categoryName);
+        saveShoppingList();
+    }
+}
+
+function deleteCategory() {
+    if (confirm("Czy na pewno chcesz usunąć tę kategorię?")) {
+        delete categories[currentCategory];
+        renderCategories();
+        closeCategoryModal();
+        saveShoppingList();
+    }
+}
+
+function saveShoppingList() {
+    localStorage.setItem(currentUser + "_shoppingList", JSON.stringify(categories));
+}
+
+function loadShoppingList() {
+    var storedList = localStorage.getItem(currentUser + "_shoppingList");
+    if (storedList) {
+        categories = JSON.parse(storedList);
+        renderCategories();
+    }
+}
+
+function toggleDarkMode() {
+    darkMode = !darkMode;
+    if (darkMode) {
+        document.body.classList.add("dark-mode");
+        document.querySelectorAll('.btn').forEach(function(btn) {
+            btn.classList.remove('light-mode');
+        });
+        document.querySelectorAll('.fullscreen-content').forEach(function(content) {
+            content.classList.remove('light-mode');
+        });
+    } else {
+        document.body.classList.remove("dark-mode");
+        document.querySelectorAll('.btn').forEach(function(btn) {
+            btn.classList.add('light-mode');
+        });
+        document.querySelectorAll('.fullscreen-content').forEach(function(content) {
+            content.classList.add('light-mode');
+        });
+    }
+}
+
+// Obsługa zamykania modala po kliknięciu poza nim
+window.onclick = function(event) {
+    var modals = document.getElementsByClassName("fullscreen");
+    for (var i = 0; i < modals.length; i++) {
+        var modal = modals[i];
+        if (event.target === modal) {
+            modal.style.display = "none";
+            if (modal.id === "categoryModal") {
+                currentCategory = "";
+                document.getElementById("shoppingList").style.display = "block";
+            }
+        }
+    }
+};
+</script>
+</body>
+</html>
