@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Czy mnie kochasz?</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: pink;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        h1 {
+            font-size: 3em;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1.5em;
+            margin: 10px;
+            cursor: pointer;
+        }
+        #nie {
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+    <h1>Czy mnie kochasz?</h1>
+    <button id="tak">Tak</button>
+    <button id="nie">Nie</button>
+    <p id="message" style="display:none; font-size: 2em; margin-top: 20px;">Ja ciebie też kocham</p>
+
+    <script>
+        document.getElementById('tak').addEventListener('click', function() {
+            document.getElementById('message').style.display = 'block';
+        });
+
+        const nieButton = document.getElementById('nie');
+        nieButton.addEventListener('mouseover', function() {
+            const x = Math.random() * (window.innerWidth - nieButton.offsetWidth);
+            const y = Math.random() * (window.innerHeight - nieButton.offsetHeight);
+            nieButton.style.position = 'absolute';
+            nieButton.style.left = x + 'px';
+            nieButton.style.top = y + 'px';
+        });
+    </script>
+</body>
+</html>
